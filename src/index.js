@@ -8,6 +8,7 @@ import {
 } from '@apollo/client';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import App from './App';
 // import App from './App';
 import reportWebVitals from './reportWebVitals';
 
@@ -16,6 +17,20 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+client
+  .query({
+    query: gql`
+      query GetRates {
+        rates(currency: "USD") {
+          currency
+          name
+        }
+      }
+    `,
+  })
+  .then((result) => console.log(result));
+
+// Fetch data with useQuery
 const EXCHANGE_RATES = gql`
   query GetExchangeRates {
     rates(currency: "AUD") {
@@ -26,27 +41,17 @@ const EXCHANGE_RATES = gql`
   }
 `;
 
-client
-  .query({
-    query: gql`
-      query GetRates {
-        rates(currency: "USD") {
-          currency
-        }
-      }
-    `,
-  })
-  .then((result) => console.log(result));
-
 function ExchangeRates() {
   const { loading, error, data } = useQuery(EXCHANGE_RATES);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
-  return data.rates.map(({ currency, rate }) => (
+  return data.rates.map(({ currency, rate, name }) => (
     <div key={currency}>
       <p>
+        {name}
+        <br />
         {currency}: {rate}
       </p>
     </div>
